@@ -38,7 +38,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from '@/hooks/use-toast';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { Lock, Check, AlertCircle, Sparkles, Filter, Calendar, Clock, AlertTriangle, Search, BarChart3, Grid3X3, Zap } from 'lucide-react';
-import { apiFetch } from '@/lib/api';
 import { formatSemester, formatYear } from '@/lib/utils';
 import { StatisticsDashboard } from '@/components/schedule/StatisticsDashboard';
 import { VirtualizedScheduleGrid } from '@/components/schedule/VirtualizedScheduleGrid';
@@ -155,7 +154,7 @@ export default function SchedulePage() {
 
   const fetchSettings = async () => {
     try {
-      const res = await apiFetch('/api/settings');
+      const res = await fetch('/api/settings');
       const data = await res.json();
       if (data.settings) {
         setSettings({
@@ -171,15 +170,15 @@ export default function SchedulePage() {
   const fetchFilterOptions = async () => {
     try {
       // Fetch sections
-      const sectionsRes = await apiFetch('/api/programs');
+      const sectionsRes = await fetch('/api/programs');
       const sectionsData = await sectionsRes.json();
       
       // Fetch professors
-      const profRes = await apiFetch('/api/professors');
+      const profRes = await fetch('/api/professors');
       const profData = await profRes.json();
 
       // Fetch subjects count
-      const subjectsRes = await apiFetch('/api/subjects');
+      const subjectsRes = await fetch('/api/subjects');
       const subjectsData = await subjectsRes.json();
 
       // Get unique years from sections
@@ -215,7 +214,7 @@ export default function SchedulePage() {
         url += `?${params.toString()}`;
       }
 
-      const res = await apiFetch(url);
+      const res = await fetch(url);
       const data = await res.json();
       setSchedule(data.schedule || []);
       
@@ -243,7 +242,7 @@ export default function SchedulePage() {
   const generateSchedule = async () => {
     try {
       setLoading(true);
-      const res = await apiFetch('/api/schedule', {
+      const res = await fetch('/api/schedule', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -300,7 +299,7 @@ export default function SchedulePage() {
     if (!editingItem || !validation.valid) return;
 
     try {
-      const res = await apiFetch(`/api/schedule/${editingItem.id}`, {
+      const res = await fetch(`/api/schedule/${editingItem.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

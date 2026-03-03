@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Users, Plus, Edit2, Trash2, Loader2, Search, Briefcase, AlertCircle, Check } from 'lucide-react';
-import { apiFetch } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -59,7 +58,7 @@ export default function ProfessorsPage() {
   const fetchProfessors = async () => {
     try {
       setLoading(true);
-      const res = await apiFetch('/api/professors');
+      const res = await fetch('/api/professors');
       const data = await res.json();
       setProfessors(data.professors || []);
     } catch (error) {
@@ -75,7 +74,7 @@ export default function ProfessorsPage() {
 
   const fetchDepartments = async () => {
     try {
-      const res = await apiFetch('/api/departments');
+      const res = await fetch('/api/departments');
       const data = await res.json();
       setDepartments(data.departments || []);
     } catch (error) {
@@ -148,7 +147,7 @@ export default function ProfessorsPage() {
       console.log('Method:', method);
       console.log('URL:', url);
 
-      const res = await apiFetch(url, {
+      const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -192,7 +191,7 @@ export default function ProfessorsPage() {
     if (!professorToDelete) return;
 
     try {
-      const res = await apiFetch(`/api/professors/${professorToDelete.id}`, {
+      const res = await fetch(`/api/professors/${professorToDelete.id}`, {
         method: 'DELETE',
       });
 

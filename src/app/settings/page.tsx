@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Settings, Database, Loader2, CheckCircle, Save, Trash2, RefreshCw, AlertTriangle, Users, BookOpen, GraduationCap, Building2 } from 'lucide-react';
-import { apiFetch } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -71,7 +70,7 @@ export default function SettingsPage() {
   const fetchSettings = async () => {
     try {
       setLoading(true);
-      const res = await apiFetch('/api/settings');
+      const res = await fetch('/api/settings');
       const data = await res.json();
       if (data.settings) {
         setSettings(data.settings);
@@ -94,7 +93,7 @@ export default function SettingsPage() {
 
   const fetchExistingData = async () => {
     try {
-      const res = await apiFetch('/api/seed');
+      const res = await fetch('/api/seed');
       const data = await res.json();
       if (data.success) {
         setExistingData(data.existingData);
@@ -107,7 +106,7 @@ export default function SettingsPage() {
   const handleClearDatabase = async () => {
     setClearing(true);
     try {
-      const res = await apiFetch('/api/seed', {
+      const res = await fetch('/api/seed', {
         method: 'DELETE',
       });
 
@@ -145,7 +144,7 @@ export default function SettingsPage() {
   const handleSeedDatabase = async () => {
     setSeeding(true);
     try {
-      const res = await apiFetch('/api/seed', {
+      const res = await fetch('/api/seed', {
         method: 'POST',
       });
 
@@ -188,7 +187,7 @@ export default function SettingsPage() {
   const handleSaveSettings = async () => {
     try {
       setSaving(true);
-      const res = await apiFetch('/api/settings', {
+      const res = await fetch('/api/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

@@ -17,7 +17,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
 import { AlertCircle, Calendar, Clock, Loader2, Search, Check } from 'lucide-react';
-import { apiFetch } from '@/lib/api';
 import { formatSemester } from '@/lib/utils';
 
 // Section-based gradient color mapping
@@ -80,7 +79,7 @@ export default function MySchedulePage() {
 
   const fetchSettings = async () => {
     try {
-      const res = await apiFetch('/api/settings');
+      const res = await fetch('/api/settings');
       const data = await res.json();
       if (data.settings) {
         setSettings({
@@ -96,7 +95,7 @@ export default function MySchedulePage() {
   const fetchSchedule = async () => {
     try {
       setLoading(true);
-      const res = await apiFetch(`/api/schedule?type=professor&professorId=${user?.id}`);
+      const res = await fetch(`/api/schedule?type=professor&professorId=${user?.id}`);
       const data = await res.json();
       setSchedule(data.schedule || []);
     } catch (error) {

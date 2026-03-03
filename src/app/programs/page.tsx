@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { School, Plus, Edit2, Trash2, Loader2, Users, Building2 } from 'lucide-react';
-import { apiFetch } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -50,8 +49,8 @@ export default function ProgramsPage() {
     try {
       setLoading(true);
       const [programsRes, departmentsRes] = await Promise.all([
-        apiFetch('/api/programs'),
-        apiFetch('/api/departments')
+        fetch('/api/programs'),
+        fetch('/api/departments')
       ]);
 
       const programsData = await programsRes.json();
@@ -126,7 +125,7 @@ export default function ProgramsPage() {
       let res;
       if (editingItem) {
         // Update existing item
-        res = await apiFetch(`/api/${dialogType}s/${editingItem.id}`, {
+        res = await fetch(`/api/${dialogType}s/${editingItem.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -136,7 +135,7 @@ export default function ProgramsPage() {
         });
       } else {
         // Create new item
-        res = await apiFetch('/api/programs', {
+        res = await fetch('/api/programs', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -179,7 +178,7 @@ export default function ProgramsPage() {
     if (!confirm(`Are you sure you want to delete this ${type}?`)) return;
 
     try {
-      const res = await apiFetch(`/api/${type}s/${id}`, {
+      const res = await fetch(`/api/${type}s/${id}`, {
         method: 'DELETE',
       });
 

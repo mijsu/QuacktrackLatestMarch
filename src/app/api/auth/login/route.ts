@@ -40,18 +40,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ user, success: true });
   } catch (error) {
-    // Log full error for server diagnostics
-    console.error('Login error:', error?.message ?? error, error);
-
-    // Return additional detail to help debugging (safe for staging/dev).
-    // If this is a production deployment you may want to remove or redact
-    // error details to avoid leaking internal information.
-    const detail = typeof error === 'object' && error !== null && 'message' in error
-      ? (error as any).message
-      : String(error);
-
+    console.error('Login error:', error);
     return NextResponse.json(
-      { error: 'Login failed', detail },
+      { error: 'Login failed' },
       { status: 500 }
     );
   }

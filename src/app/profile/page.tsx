@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { User, Loader2, CheckCircle, Save, Shield } from 'lucide-react';
-import { apiFetch } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -38,7 +37,7 @@ export default function ProfilePage() {
 
     try {
       setSaving(true);
-      const res = await apiFetch(`/api/professors/${user.id}`, {
+      const res = await fetch(`/api/professors/${user.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

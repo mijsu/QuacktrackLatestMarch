@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '@/lib/types';
-import { apiFetch } from '@/lib/api';
 
 interface AuthContextType {
   user: User | null;
@@ -27,7 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const res = await apiFetch('/api/auth/login', {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -49,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signup = async (email: string, password: string, name: string, role: 'admin' | 'professor', professorId?: string) => {
     try {
-      const res = await apiFetch('/api/auth/signup', {
+      const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, name, role, professorId }),
@@ -78,7 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return;
 
     try {
-      const res = await apiFetch('/api/auth/me');
+      const res = await fetch('/api/auth/me');
       const data = await res.json();
 
       if (data.success && data.user) {

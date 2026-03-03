@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { apiFetch } from '@/lib/api';
 import { Department, Program } from '@/lib/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -71,9 +70,9 @@ export default function DepartmentsPage() {
     try {
       setLoading(true);
       const [departmentsRes, programsRes, professorsRes] = await Promise.all([
-        apiFetch('/api/departments'),
-        apiFetch('/api/programs'),
-        apiFetch('/api/professors')
+        fetch('/api/departments'),
+        fetch('/api/programs'),
+        fetch('/api/professors')
       ]);
 
       const departmentsData = await departmentsRes.json();
@@ -97,7 +96,7 @@ export default function DepartmentsPage() {
 
   const fetchPrograms = async () => {
     try {
-      const res = await apiFetch('/api/programs');
+      const res = await fetch('/api/programs');
       const data = await res.json();
       setPrograms(data.programs || []);
     } catch (error) {
@@ -139,7 +138,7 @@ export default function DepartmentsPage() {
     try {
       if (editingDepartment) {
         // Update existing department
-        const res = await apiFetch('/api/departments', {
+        const res = await fetch('/api/departments', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -163,7 +162,7 @@ export default function DepartmentsPage() {
         }
       } else {
         // Create new department
-        const res = await apiFetch('/api/departments', {
+        const res = await fetch('/api/departments', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
@@ -193,7 +192,7 @@ export default function DepartmentsPage() {
     if (!deletingDepartment) return;
 
     try {
-      const res = await apiFetch(`/api/departments?id=${deletingDepartment.id}`, {
+      const res = await fetch(`/api/departments?id=${deletingDepartment.id}`, {
         method: 'DELETE',
       });
 
@@ -229,7 +228,7 @@ export default function DepartmentsPage() {
     if (!removingProgram) return;
 
     try {
-      const res = await apiFetch(`/api/programs/${removingProgram.id}`, {
+      const res = await fetch(`/api/programs/${removingProgram.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -277,7 +276,7 @@ export default function DepartmentsPage() {
         (id: string) => id !== editingDepartment.id
       );
 
-      const res = await apiFetch(`/api/professors/${removingProfessor.id}`, {
+      const res = await fetch(`/api/professors/${removingProfessor.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

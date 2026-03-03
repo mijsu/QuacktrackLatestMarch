@@ -7,7 +7,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect, useRef } from 'react';
 import { SETTINGS_CHANGED_EVENT } from '@/lib/utils';
-import { apiFetch } from '@/lib/api';
 
 export function MobileHeader() {
   const { user } = useAuth();
@@ -26,7 +25,7 @@ export function MobileHeader() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await apiFetch('/api/settings');
+        const res = await fetch('/api/settings');
         const data = await res.json();
         if (data.settings?.systemName) {
           setSystemName(data.settings.systemName);
@@ -45,7 +44,7 @@ export function MobileHeader() {
     const handleSettingsChange = () => {
       const fetchSettings = async () => {
         try {
-          const res = await apiFetch('/api/settings');
+          const res = await fetch('/api/settings');
           const data = await res.json();
           if (data.settings?.systemName) {
             setSystemName(data.settings.systemName);

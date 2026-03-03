@@ -230,7 +230,10 @@ export async function GET() {
       existingData,
       message: existingData.hasData 
         ? 'Database already has data. Use POST to seed.' 
-        : 'Database is empty. Use POST to seed.'
+        : 'Database is empty. Use POST to seed.',
+      adminInfo: existingData.admins > 0 
+        ? `${existingData.admins} admin account(s) exist`
+        : 'No admin account. One will be created during seeding.'
     });
   } catch (error) {
     console.error('Error checking database:', error);
@@ -270,7 +273,26 @@ export async function POST(request: NextRequest) {
       professors: 0,
       subjects: 0,
       sections: 0,
+      adminCreated: false,
     };
+
+    // Step 0: Create default admin if none exists
+    console.log('Step 0: Checking for admin account...');
+    if (existingData.admins === 0) {
+      console.log('  No admin found. Creating default admin...');
+      const adminRef = await addDoc(collection(db, 'users'), {
+        email: 'admin@university.edu',
+        name: 'System Administrator',
+        role: 'admin',
+        createdAt: new Date()
+      });
+      console.log(`  Created default admin: ${adminRef.id}`);
+      console.log(`  Email: admin@university.edu`);
+      console.log(`  Password: (any password will work for demo)`);
+      results.adminCreated = true;
+    } else {
+      console.log(`  Found ${existingData.admins} existing admin account(s). Skipping admin creation.`);
+    }
 
     // Step 1: Create Departments
     console.log('Step 1: Creating departments...');
@@ -430,6 +452,9 @@ export async function POST(request: NextRequest) {
     console.log('SEEDING COMPLETE');
     console.log('='.repeat(70));
     console.log(`\nSummary:`);
+    if (results.adminCreated) {
+      console.log(`  Admin: Created (admin@university.edu)`);
+    }
     console.log(`  Departments: ${results.departments}`);
     console.log(`  Programs: ${results.programs}`);
     console.log(`  Professors: ${results.professors}`);
@@ -448,8 +473,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Database seeded successfully',
+      message: results.adminCreated 
+        ? 'Database seeded successfully. Default admin created: admin@university.edu (use any password)'
+        : 'Database seeded successfully',
       data: results,
+      adminCredentials: results.adminCreated ? {
+        email: 'admin@university.edu',
+        note: 'Use any password to login (demo mode)'
+      } : undefined,
       analysis: {
         totalProfessorCapacity: totalCapacity,
         estimatedSubjectsPerSemester: Math.round(results.subjects / 2),
@@ -465,16 +496,17 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE - Clear all data
+// DELETE - Clear all data (preserves admin users)
 export async function DELETE() {
   try {
     console.log('\n' + '='.repeat(70));
     console.log('CLEARING DATABASE - Starting');
     console.log('='.repeat(70) + '\n');
 
-    const collections = ['departments', 'programs', 'users', 'subjects', 'sections', 'schedule'];
+    const collections = ['departments', 'programs', 'subjects', 'sections', 'schedule'];
     let totalDeleted = 0;
 
+    // Clear non-user collections
     for (const colName of collections) {
       const snapshot = await getDocs(collection(db, colName));
       if (!snapshot.empty) {
@@ -488,13 +520,35 @@ export async function DELETE() {
       }
     }
 
+    // For users collection, only delete professors (preserve admins)
+    const usersSnapshot = await getDocs(collection(db, 'users'));
+    if (!usersSnapshot.empty) {
+      const batch = writeBatch(db);
+      let professorsDeleted = 0;
+      
+      usersSnapshot.docs.forEach((doc) => {
+        const userData = doc.data();
+        if (userData.role === 'professor') {
+          batch.delete(doc.ref);
+          professorsDeleted++;
+        }
+      });
+      
+      if (professorsDeleted > 0) {
+        await batch.commit();
+        console.log(`  Deleted ${professorsDeleted} professors (admin accounts preserved)`);
+        totalDeleted += professorsDeleted;
+      }
+    }
+
     console.log('\n' + '='.repeat(70));
     console.log(`DATABASE CLEARED - Total: ${totalDeleted} documents deleted`);
+    console.log('Admin accounts preserved');
     console.log('='.repeat(70) + '\n');
 
     return NextResponse.json({
       success: true,
-      message: `Database cleared. ${totalDeleted} documents deleted.`,
+      message: `Database cleared. ${totalDeleted} documents deleted. Admin accounts preserved.`,
       deleted: totalDeleted
     });
   } catch (error) {
@@ -508,12 +562,13 @@ export async function DELETE() {
 
 // Helper function to check existing data
 async function checkExistingData() {
-  const [depts, progs, profs, subs, secs] = await Promise.all([
+  const [depts, progs, profs, subs, secs, admins] = await Promise.all([
     getDocs(collection(db, 'departments')),
     getDocs(collection(db, 'programs')),
     getDocs(query(collection(db, 'users'), where('role', '==', 'professor'))),
     getDocs(collection(db, 'subjects')),
     getDocs(collection(db, 'sections')),
+    getDocs(query(collection(db, 'users'), where('role', '==', 'admin'))),
   ]);
 
   const data = {
@@ -522,6 +577,7 @@ async function checkExistingData() {
     professors: profs.size,
     subjects: subs.size,
     sections: secs.size,
+    admins: admins.size,
     hasData: depts.size > 0 || progs.size > 0 || profs.size > 0 || subs.size > 0 || secs.size > 0
   };
 

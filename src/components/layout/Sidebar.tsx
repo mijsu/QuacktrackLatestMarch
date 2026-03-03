@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn, SETTINGS_CHANGED_EVENT } from '@/lib/utils';
-import { apiFetch } from '@/lib/api';
 import {
   LayoutDashboard,
   BookOpen,
@@ -114,7 +113,7 @@ export function Sidebar({ className }: SidebarProps) {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await apiFetch('/api/settings');
+        const res = await fetch('/api/settings');
         const data = await res.json();
         if (data.settings?.systemName) {
           setSystemName(data.settings.systemName);
@@ -133,7 +132,7 @@ export function Sidebar({ className }: SidebarProps) {
     const handleSettingsChange = () => {
       const fetchSettings = async () => {
         try {
-          const res = await apiFetch('/api/settings');
+          const res = await fetch('/api/settings');
           const data = await res.json();
           if (data.settings?.systemName) {
             setSystemName(data.settings.systemName);

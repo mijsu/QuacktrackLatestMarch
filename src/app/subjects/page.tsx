@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { BookOpen, Plus, Edit2, Trash2, Loader2, AlertTriangle, Clock } from 'lucide-react';
-import { apiFetch } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -48,7 +47,7 @@ export default function SubjectsPage() {
 
   const fetchPrograms = async () => {
     try {
-      const res = await apiFetch('/api/programs');
+      const res = await fetch('/api/programs');
       const data = await res.json();
       setPrograms(data.programs || []);
     } catch (error) {
@@ -59,7 +58,7 @@ export default function SubjectsPage() {
   const fetchSubjects = async () => {
     try {
       setLoading(true);
-      const res = await apiFetch('/api/subjects');
+      const res = await fetch('/api/subjects');
       const data = await res.json();
       setSubjects(data.subjects || []);
     } catch (error) {
@@ -111,7 +110,7 @@ export default function SubjectsPage() {
       const method = editingSubject ? 'PUT' : 'POST';
       const url = editingSubject ? `/api/subjects/${editingSubject.id}` : '/api/subjects';
 
-      const res = await apiFetch(url, {
+      const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -148,7 +147,7 @@ export default function SubjectsPage() {
     if (!confirm('Are you sure you want to delete this subject?')) return;
 
     try {
-      const res = await apiFetch(`/api/subjects/${id}`, {
+      const res = await fetch(`/api/subjects/${id}`, {
         method: 'DELETE',
       });
 

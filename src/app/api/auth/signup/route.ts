@@ -31,9 +31,13 @@ export async function POST(request: NextRequest) {
       email,
       name,
       role: role as 'admin' | 'professor',
-      professorId: professorId || undefined,
       createdAt: new Date()
     };
+
+    // Only add professorId if it's provided and not empty
+    if (professorId && professorId.trim() !== '') {
+      userData.professorId = professorId;
+    }
 
     const docRef = await addDoc(collection(db, 'users'), userData);
 

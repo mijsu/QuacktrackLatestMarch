@@ -1,8 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // static export for capacitor; this will generate an `out` folder
-  output: "export",
+  output: "standalone",
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,
